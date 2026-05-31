@@ -6,37 +6,157 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Iniciar Sesión – Productos App</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap');
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
-               min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-        .login-box { background: white; border-radius: 10px; padding: 40px;
-                     width: 380px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
-        .login-box h1 { color: #1a73e8; font-size: 1.5rem; text-align: center; margin-bottom: 8px; }
-        .login-box .subtitle { color: #888; font-size: 0.9rem; text-align: center; margin-bottom: 28px; }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: #050005;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-image:
+                repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255, 0, 128, 0.03) 2px, rgba(255, 0, 128, 0.03) 4px),
+                radial-gradient(ellipse 80% 50% at 50% 30%, rgba(255, 0, 128, 0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 30% at 80% 80%, rgba(255, 68, 176, 0.04) 0%, transparent 50%);
+        }
+
+        .login-box {
+            background: rgba(13, 0, 10, 0.95);
+            padding: 40px 35px;
+            width: 380px;
+            border: 2px solid var(--pink, #FF0080);
+            box-shadow: 0 0 40px rgba(255, 0, 128, 0.08), inset 0 0 60px rgba(255, 0, 128, 0.02);
+            position: relative;
+        }
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: -2px; left: 20%;
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #fff, transparent);
+            opacity: 0.3;
+        }
+        .login-box::after {
+            content: '';
+            position: absolute;
+            bottom: -2px; left: 20%;
+            width: 60%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--pink, #FF0080), transparent);
+            opacity: 0.5;
+        }
+
+        .login-box h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 900;
+            text-align: center;
+            margin-bottom: 4px;
+            color: #fff;
+            letter-spacing: 4px;
+            text-shadow: 0 0 15px rgba(255, 0, 128, 0.5);
+        }
+        .login-box h1 span {
+            color: var(--pink, #FF0080);
+            text-shadow: 0 0 20px rgba(255, 0, 128, 0.7);
+            animation: neonPulse 2s infinite;
+        }
+        .login-box .subtitle {
+            color: #886688;
+            font-size: 0.8rem;
+            text-align: center;
+            margin-bottom: 28px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+        }
+
+        @keyframes neonPulse {
+            0%, 100% { text-shadow: 0 0 7px rgba(255, 0, 128, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(255, 0, 128, 0.8), 0 0 40px rgba(255, 0, 128, 0.4); }
+        }
+
         .form-group { margin-bottom: 18px; }
-        label { display: block; font-size: 0.85rem; color: #555; margin-bottom: 6px; font-weight: bold; }
+        label {
+            display: block;
+            font-size: 0.75rem;
+            color: #AA88AA;
+            margin-bottom: 6px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
         input[type=email], input[type=password] {
-            width: 100%; padding: 10px 12px; border: 1px solid #ddd;
-            border-radius: 6px; font-size: 0.95rem; transition: border-color 0.2s; }
-        input:focus { outline: none; border-color: #1a73e8; box-shadow: 0 0 0 2px rgba(26,115,232,0.15); }
-        .input-error { border-color: #e53935 !important; }
-        .error-msg { color: #e53935; font-size: 0.8rem; margin-top: 4px; }
-        .alert { padding: 10px 14px; border-radius: 6px; margin-bottom: 18px; font-size: 0.9rem; }
-        .alert-danger { background: #fdecea; color: #c62828; border: 1px solid #ef9a9a; }
-        .alert-success { background: #e8f5e9; color: #2e7d32; border: 1px solid #a5d6a7; }
-        .alert-info { background: #e3f2fd; color: #1565c0; border: 1px solid #90caf9; }
-        .btn-login { width: 100%; background: #1a73e8; color: white; border: none;
-                     padding: 12px; border-radius: 6px; font-size: 1rem;
-                     cursor: pointer; font-weight: bold; margin-top: 8px; }
-        .btn-login:hover { background: #1558b0; }
-        .hint { background: #f8f9fa; border-radius: 6px; padding: 12px; margin-top: 20px;
-                font-size: 0.82rem; color: #666; border-left: 3px solid #1a73e8; }
-        .hint strong { color: #1a73e8; }
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1.5px solid rgba(255, 0, 128, 0.1);
+            font-size: 0.9rem;
+            color: #fff;
+            transition: all 0.25s;
+            font-family: 'Rajdhani', sans-serif;
+        }
+        input:focus {
+            outline: none;
+            border-color: #FF0080;
+            box-shadow: 0 0 25px rgba(255, 0, 128, 0.08);
+            background: rgba(255, 0, 128, 0.02);
+        }
+        .input-error { border-color: #FF0044 !important; }
+        .error-msg { color: #FF0044; font-size: 0.75rem; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .alert { padding: 10px 14px; margin-bottom: 18px; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .alert-danger { background: rgba(255, 0, 68, 0.04); color: #FF0044; border-left: 3px solid #FF0044; }
+        .alert-success { background: rgba(0, 255, 136, 0.04); color: #00FF88; border-left: 3px solid #00FF88; }
+        .alert-info { background: rgba(41, 121, 255, 0.04); color: #2979FF; border-left: 3px solid #2979FF; }
+        .btn-login {
+            width: 100%;
+            background: transparent;
+            color: var(--pink, #FF0080);
+            border: 2px solid var(--pink, #FF0080);
+            padding: 12px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 700;
+            margin-top: 8px;
+            transition: all 0.3s ease;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 0, 128, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        .btn-login:hover::before { left: 100%; }
+        .btn-login:hover {
+            background: var(--pink, #FF0080);
+            color: #000;
+            box-shadow: 0 0 35px rgba(255, 0, 128, 0.4);
+        }
+        .hint {
+            background: rgba(255, 255, 255, 0.01);
+            padding: 14px;
+            margin-top: 24px;
+            font-size: 0.75rem;
+            color: #886688;
+            border-left: 3px solid rgba(255, 0, 128, 0.15);
+            letter-spacing: 0.5px;
+        }
+        .hint strong { color: var(--pink, #FF0080); }
     </style>
 </head>
 <body>
     <div class="login-box">
-        <h1>🛒 Productos App</h1>
+        <h1>PRODUCTOS <span>APP</span></h1>
         <p class="subtitle">Ingrese sus credenciales para continuar</p>
  
         {{-- Mensajes de sesión (éxito, info) --}}

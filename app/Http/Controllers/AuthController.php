@@ -1,15 +1,16 @@
 <?php
- 
+
 namespace App\Http\Controllers;
- 
+
+use App\Models\CarritoItem; // Asegúrate de que este modelo exista en tu proyecto
+use App\Models\Producto;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
- 
+
 class AuthController extends Controller
 {
     /**
      * Muestra el formulario de login.
-     * Si el usuario ya está autenticado, redirige al home.
      */
     public function showLogin()
     {
@@ -18,51 +19,82 @@ class AuthController extends Controller
         }
         return view('auth.login');
     }
- 
+
     /**
-     * Procesa el formulario de login.
-     * 1. Valida que los campos no estén vacíos.
-     * 2. Intenta autenticar al usuario con Auth::attempt().
-     * 3. Si falla, regresa con mensaje de error.
-     * 4. Si tiene éxito, regenera la sesión (seguridad) y redirige.
+     * Procesa el formulario de login y fusiona el carrito de invitado con la BD.
      */
     public function login(Request $request)
     {
-        // Paso 1: Validar campos del formulario
+        // 1. Validar campos del formulario
         $request->validate([
             'email'    => 'required|email',
             'password' => 'required|min:6',
         ], [
-            // Mensajes de error personalizados en español
             'email.required'    => 'El correo electrónico es obligatorio.',
             'email.email'       => 'Ingrese un correo electrónico válido.',
             'password.required' => 'La contraseña es obligatoria.',
             'password.min'      => 'La contraseña debe tener al menos 6 caracteres.',
         ]);
- 
-        // Paso 2: Intentar autenticar
+
+        // 2. RESPALDO: Guardar el carrito temporal que armó mientras era visitante/invitado
+        $sessionCarrito = session('carrito', []);
+
+        // 3. Intentar autenticar al usuario
         $credenciales = $request->only('email', 'password');
- 
+
         if (Auth::attempt($credenciales)) {
-            // Paso 3: Autenticación exitosa
-            $request->session()->regenerate(); // Previene ataques de session fixation
+            // Autenticación exitosa: se regenera la sesión por seguridad
+            $request->session()->regenerate(); 
+
+            $userId = Auth::id();
+
+            // 4. FUSIONAR: Pasar los productos de la sesión temporal a la Base de Datos
+            if (!empty($sessionCarrito)) {
+                foreach ($sessionCarrito as $productoId => $cantidad) {
+                    
+                    // Buscamos si el usuario ya tenía guardado este producto antes en la BD
+                    // Nota: Se asume que tu tabla usa 'user_id' e 'id_producto' como llaves correspondientes
+                    $item = CarritoItem::where('user_id', $userId)
+                        ->where('id_producto', $productoId)
+                        ->first();
+
+                    if ($item) {
+                        // Si ya existía en la BD, sumamos la cantidad seleccionada como invitado
+                        $item->cantidad += $cantidad;
+                        $item->save();
+                    } else {
+                        // Si es nuevo, registramos la fila en la BD enlazada al usuario logueado
+                        CarritoItem::create([
+                            'user_id'     => $userId,
+                            'id_producto' => $productoId,
+                            'cantidad'    => $cantidad,
+                        ]);
+                    }
+                }
+
+                // Opcional: Una vez migrado con éxito a la base de datos, limpiamos la sesión
+                // para que el CarritoController lea directamente los elementos guardados.
+                session()->forget('carrito');
+            }
+
             return redirect()->route('home')->with('success', '¡Bienvenido, ' . Auth::user()->name . '!');
         }
- 
-        // Paso 4: Credenciales incorrectas
+
+        // Credenciales incorrectas
         return back()->withErrors([
             'email' => 'Las credenciales no coinciden con nuestros registros.',
-        ])->onlyInput('email'); // Recuerda el email pero NO la contraseña
+        ])->onlyInput('email');
     }
- 
+
     /**
-     * Cierra la sesión del usuario actual.
+     * Cierra la sesión del usuario actual de forma limpia.
      */
     public function logout(Request $request)
     {
         Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        
         return redirect()->route('login')->with('info', 'Ha cerrado sesión correctamente.');
     }
 }
